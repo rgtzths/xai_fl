@@ -19,13 +19,13 @@ from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef
 
 tf.keras.utils.set_random_seed(7)
 
-def create_MLP(learning_rate):
+def create_model():
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Dense(32, activation="relu", input_shape=(60,)))
-    model.add(tf.keras.layers.Dense(32, activation="relu"))
-    model.add(tf.keras.layers.Dropout(0.1))
-    model.add(tf.keras.layers.Dense(3, activation="softmax"))
-    model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate), loss='categorical_crossentropy', metrics=['accuracy'])
+    model.add(tf.keras.layers.LSTM(2048,input_shape=(63,)))
+    model.add(tf.keras.layers.Dense(1024, activation="tanh"))
+    model.add(tf.keras.layers.Dense(512, activation="tanh"))
+    model.add(tf.keras.layers.Dense(1, activation="sigmoid"))
+    model.compile(optimizer="adam", loss='categorical_crossentropy', metrics=['accuracy'])
 
     return model
 
@@ -54,7 +54,7 @@ output = pathlib.Path(output)
 output.mkdir(parents=True, exist_ok=True)
 dataset = pathlib.Path(dataset)
 
-model = create_MLP(learning_rate)
+model = create_model(learning_rate)
 
 start = time.time()
 
