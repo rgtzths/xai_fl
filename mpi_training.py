@@ -19,13 +19,13 @@ from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef
 
 tf.keras.utils.set_random_seed(7)
 
-def create_model():
+def create_model(look_back, n_features):
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.LSTM(2048,input_shape=(63,)))
+    model.add(tf.keras.layers.LSTM(2048,input_shape=(look_back, n_features)))
     model.add(tf.keras.layers.Dense(1024, activation="tanh"))
     model.add(tf.keras.layers.Dense(512, activation="tanh"))
     model.add(tf.keras.layers.Dense(1, activation="sigmoid"))
-    model.compile(optimizer="adam", loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer="adam", loss='binary_crossentropy', metrics=['accuracy'])
 
     return model
 
@@ -35,35 +35,38 @@ size = comm.Get_size()
 
 parser = argparse.ArgumentParser(description='Train and test the model')
 parser.add_argument('--g_epochs', type=int, help='Global epochs number', default=10)
-parser.add_argument('--l_epochs', type=int, help='local epochs number', default=5)
-parser.add_argument('-b', type=int, help='Batch size', default=64)
-parser.add_argument('-l', type=float, help='Learning rate', default=0.00001)
-parser.add_argument('-d', type=str, help='Dataset', default="one_hot/")
+parser.add_argument('--l_epochs', type=int, help='local epochs number', default=1)
+parser.add_argument('-b', type=int, help='Batch size', default=256)
+parser.add_argument('-d', type=str, help='Dataset', default="dataset/temp_dataset")
 parser.add_argument('-o', type=str, help='Output folder', default="results")
+parser.add_argument('-l', type=int, help='Lookback used', default=10)
 
 args = parser.parse_args()
 
 global_epochs = args.g_epochs
 local_epochs = args.l_epochs
 batch_size = args.b
-learning_rate = args.l
 dataset = args.d
 output = args.o
+look_back = args.l
 
 output = pathlib.Path(output)
 output.mkdir(parents=True, exist_ok=True)
 dataset = pathlib.Path(dataset)
 
-model = create_model(learning_rate)
 
 start = time.time()
 
 if rank == 0:
     node_weights = []
     X_cv = np.loadtxt(dataset/"x_cv.csv", delimiter=",", dtype=int)
+    X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
+
     y_cv = np.loadtxt(dataset/"y_cv.csv", delimiter=",", dtype=int)
 
     val_dataset = tf.data.Dataset.from_tensor_slices(X_cv).batch(batch_size)
+
+    model = create_model(look_back, X_cv.shape[-1])
 
     #Get the amount of training examples of each worker and divides it by the total
     #of examples to create a weighted average of the model weights
@@ -79,10 +82,13 @@ if rank == 0:
 
 else:
     X_train = np.loadtxt(dataset/("x_train_subset_%d.csv" % rank), delimiter=",", dtype=int)
+    X_train = np.reshape(X_train, (X_train.shape[0], look_back, -1))
+
     y_train = np.loadtxt(dataset/("y_train_subset_%d.csv" % rank), delimiter=",", dtype=int)
-    y_train = tf.keras.utils.to_categorical(y_train)
 
     train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(batch_size)
+
+    model = create_model(look_back, X_train.shape[-1])
 
     comm.send(len(X_train), dest=0, tag=1000)
 
