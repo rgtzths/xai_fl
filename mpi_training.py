@@ -12,9 +12,9 @@ import json
 import pathlib
 import time
 
+from mpi4py import MPI
 import numpy as np
 import tensorflow as tf
-from mpi4py import MPI
 from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef
 
 tf.keras.utils.set_random_seed(7)
