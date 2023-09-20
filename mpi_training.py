@@ -64,10 +64,10 @@ if rank == 0:
 #
     #y_cv = np.loadtxt(dataset/"y_cv.csv", delimiter=",", dtype=int)
 
-    X_cv = np.loadtxt(dataset/("x_train_subset_1.csv" % rank), delimiter=",", dtype=int)[-100:,:]
+    X_cv = np.loadtxt(dataset/("x_train_subset_1.csv"), delimiter=",", dtype=int)[-100:,:]
     X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
 
-    y_cv = np.loadtxt(dataset/("y_train_subset_1.csv" % rank), delimiter=",", dtype=int)[-100:,:]
+    y_cv = np.loadtxt(dataset/("y_train_subset_1.csv"), delimiter=",", dtype=int)[-100:]
 
     val_dataset = tf.data.Dataset.from_tensor_slices(X_cv).batch(batch_size)
 
@@ -89,7 +89,7 @@ else:
     X_train = np.loadtxt(dataset/("x_train_subset_%d.csv" % rank), delimiter=",", dtype=int)[:100,:]
     X_train = np.reshape(X_train, (X_train.shape[0], look_back, -1))
 
-    y_train = np.loadtxt(dataset/("y_train_subset_%d.csv" % rank), delimiter=",", dtype=int)[:100,:]
+    y_train = np.loadtxt(dataset/("y_train_subset_%d.csv" % rank), delimiter=",", dtype=int)[:100]
 
     train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(batch_size)
 
