@@ -81,7 +81,7 @@ if rank == 0:
     results["times"]["loads"].append(time.time() - start)
 
 else:
-    X_train = np.loadtxt(dataset/("x_train_subset_%d.csv" % rank), delimiter=",", dtype=int)
+    X_train = np.loadtxt(dataset/("x_train_subset_%d.csv" % rank), delimiter=",", dtype=int)[100,:]
     X_train = np.reshape(X_train, (X_train.shape[0], look_back, -1))
 
     y_train = np.loadtxt(dataset/("y_train_subset_%d.csv" % rank), delimiter=",", dtype=int)

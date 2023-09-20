@@ -2,3 +2,8 @@ master slots=1 max_slots=1
 worker1    slots=1 max_slots=1
 worker2    slots=1 max_slots=1
 worker3    slots=1 max_slots=1
+worker4    slots=1 max_slots=1
+worker5    slots=1 max_slots=1
+worker6    slots=1 max_slots=1
+worker7    slots=1 max_slots=1
+worker8    slots=1 max_slots=1
