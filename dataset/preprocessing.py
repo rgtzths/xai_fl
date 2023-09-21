@@ -214,6 +214,6 @@ def preprocessing(kpi_file, distances_file, met_forecast_file, rl_sites_file, me
         except:
             print(rl_mlid)
 
-
+##Add here argparse etc
 preprocessing("train/rl-kpis.tsv", "train/distances.tsv", "train/met-forecast.tsv", "train/rl-sites.tsv",  "train/met-stations.tsv","./preprocessed/")
 

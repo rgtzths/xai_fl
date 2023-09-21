@@ -17,7 +17,8 @@ import tensorflow as tf
 from mpi4py import MPI
 from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef
 
-tf.keras.utils.set_random_seed(7)
+tf.keras.utils.set_random_seed(42)
+
 
 def create_model(look_back, n_features):
     model = tf.keras.models.Sequential()
