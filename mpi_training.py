@@ -22,7 +22,7 @@ tf.keras.utils.set_random_seed(42)
 
 def create_model(look_back, n_features):
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.LSTM(2048,input_shape=(look_back, n_features)))
+    model.add(tf.keras.layers.LSTM(512, input_shape=(look_back, n_features)), dropout=0.1)
     model.add(tf.keras.layers.Dense(1024, activation="tanh"))
     model.add(tf.keras.layers.Dense(512, activation="tanh"))
     model.add(tf.keras.layers.Dense(1, activation="sigmoid"))
