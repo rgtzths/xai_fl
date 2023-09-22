@@ -22,7 +22,7 @@ tf.keras.utils.set_random_seed(42)
 
 def create_model(look_back, n_features):
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.LSTM(512, input_shape=(look_back, n_features)), dropout=0.1)
+    model.add(tf.keras.layers.LSTM(10, input_shape=(look_back, n_features), dropout=0.1))
     model.add(tf.keras.layers.Dense(1024, activation="tanh"))
     model.add(tf.keras.layers.Dense(512, activation="tanh"))
     model.add(tf.keras.layers.Dense(1, activation="sigmoid"))
@@ -60,10 +60,15 @@ start = time.time()
 
 if rank == 0:
     node_weights = []
-    X_cv = np.loadtxt(dataset/"x_cv.csv", delimiter=",")
+    #X_cv = np.loadtxt(dataset/"x_cv.csv", delimiter=",")
+    #X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
+#
+    #y_cv = np.loadtxt(dataset/"y_cv.csv", delimiter=",", dtype=int)
+
+    X_cv = np.loadtxt(dataset/("x_train_subset_1.csv"), delimiter=",")
     X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
 
-    y_cv = np.loadtxt(dataset/"y_cv.csv", delimiter=",", dtype=int)
+    y_cv = np.loadtxt(dataset/("y_train_subset_1.csv"), delimiter=",", dtype=int)
 
     val_dataset = tf.data.Dataset.from_tensor_slices(X_cv).batch(batch_size)
 
