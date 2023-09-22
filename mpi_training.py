@@ -60,10 +60,15 @@ start = time.time()
 
 if rank == 0:
     node_weights = []
-    X_cv = np.loadtxt(dataset/"x_cv.csv", delimiter=",")
+    #X_cv = np.loadtxt(dataset/"x_cv.csv", delimiter=",")[:500, :]
+    #X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
+#
+    #y_cv = np.loadtxt(dataset/"y_cv.csv", delimiter=",", dtype=int)[:500]
+
+    X_cv = np.loadtxt(dataset/("x_train_subset_1.csv"), delimiter=",")
     X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
 
-    y_cv = np.loadtxt(dataset/"y_cv.csv", delimiter=",", dtype=int)
+    y_cv = np.loadtxt(dataset/("y_train_subset_1.csv"), delimiter=",", dtype=int)
 
     val_dataset = tf.data.Dataset.from_tensor_slices(X_cv).batch(batch_size)
 
