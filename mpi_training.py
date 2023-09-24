@@ -125,7 +125,7 @@ for global_epoch in range(global_epochs):
     model.set_weights(avg_weights)
 
     if rank == 0:
-        predictions = [np.argmax(x) for x in model.predict(val_dataset, verbose=0)]
+        predictions = model.predict(val_dataset, verbose=0)
         train_f1 = f1_score(y_cv, predictions, average="macro")
         train_mcc = matthews_corrcoef(y_cv, predictions)
         train_acc = accuracy_score(y_cv, predictions)
