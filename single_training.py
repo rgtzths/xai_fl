@@ -17,10 +17,10 @@ import tensorflow as tf
 from sklearn.metrics import confusion_matrix, f1_score, matthews_corrcoef
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+import keras.backend as K
 
 tf.keras.utils.set_random_seed(42)
 
-import keras.backend as K
 
 def matthews_correlation(y_true, y_pred):
     y_pred_pos = K.round(K.clip(y_pred, 0, 1))
@@ -71,7 +71,7 @@ class CustomCallback(tf.keras.callbacks.Callback):
         self.times = []
     
     def on_epoch_end(self, epoch, logs=None):
-        predictions = [0 if x < 0.5 else 1 for x in self.model.predict(self.validation_data[0], verbose=0)]
+        predictions = [round(x) for x in self.model.predict(self.validation_data[0], verbose=0)]
 
         val_f1 = f1_score(self.validation_data[1], predictions)
         val_mcc = matthews_corrcoef(self.validation_data[1], predictions)
@@ -90,11 +90,11 @@ class CustomCallback(tf.keras.callbacks.Callback):
 
 def create_LSTM(look_back, n_features):
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.GRU(256, input_shape=(look_back, n_features), return_sequences=True))
-    model.add(tf.keras.layers.GRU(128))
+    model.add(tf.keras.layers.GRU(512, input_shape=(look_back, n_features), return_sequences=True))
+    model.add(tf.keras.layers.GRU(256))
     #model.add(tf.keras.layers.Dropout(0.5))
+    model.add(tf.keras.layers.Dense(512, activation="relu"))
     model.add(tf.keras.layers.Dense(256, activation="relu"))
-    model.add(tf.keras.layers.Dense(128, activation="relu"))
     model.add(tf.keras.layers.Dense(1, activation="sigmoid"))
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['accuracy', matthews_correlation])
 
