@@ -21,10 +21,12 @@ from sklearn.ensemble import RandomForestClassifier
 tf.keras.utils.set_random_seed(42)
 
 class CustomCallback(tf.keras.callbacks.Callback):
-    def __init__(self, validation_data, start_time, verbose=0, checkpoint_file="model_checkpoint.keras"):
+    def __init__(self, validation_data,  train_data, start_time, verbose=0, checkpoint_file="model_checkpoint.keras"):
         super().__init__()
         self.X_val = validation_data[0]
         self.y_val = validation_data[1]
+        self.X_train = train_data[0]
+        self.y_train = train_data[1]
 
         self.start_time = start_time
         self.verbose = verbose
@@ -34,28 +36,38 @@ class CustomCallback(tf.keras.callbacks.Callback):
     def on_train_begin(self, logs={}):
         self.val_f1s = []
         self.val_mccs = []
+        self.train_f1s = []
+        self.train_mccs = []
         self.times = []
     
     def on_epoch_end(self, epoch, logs=None):
-        predictions = [round(x[0]) for x in self.model.predict(self.X_val, verbose=0)]
+        predictions = [round(x[0]) for x in self.model.predict(self.X_val, verbose=0, batch_size=8192)]
 
         val_f1 = f1_score(self.y_val, predictions)
         val_mcc = matthews_corrcoef(self.y_val, predictions)
+
         if val_mcc > self.best_mcc:
             self.best_mcc = val_mcc
             self.model.save_weights(self.checkpoint_file, overwrite=True, save_format=None, options=None)
+        
         self.val_f1s.append(val_f1)
         self.val_mccs.append(val_mcc)
         self.times.append(time.time() - self.start_time)
 
+        predictions = [round(x[0]) for x in self.model.predict(self.X_train, verbose=0, batch_size=1024)]
+
+        train_f1 = f1_score(self.y_train, predictions)
+        train_mcc = matthews_corrcoef(self.y_train, predictions)
+        self.train_f1s.append(train_f1)
+        self.train_mccs.append(train_mcc)
         if self.verbose > 0:
-            print("- val_f1: %f - val_mcc %f" %(val_f1, val_mcc))
+            print("- val_f1: %f - val_mcc %f - train_f1: %f - train_mcc %f" %(val_f1, val_mcc, train_f1, train_mcc))
 
         tf.keras.backend.clear_session()
         gc.collect()
 
     def get_metrics(self):
-        return self.val_f1s, self.val_mccs, self.times
+        return self.train_f1s, self.train_mccs, self.val_f1s, self.val_mccs, self.times
 
 def create_LSTM(look_back, n_features):
     model = tf.keras.models.Sequential()
@@ -93,13 +105,9 @@ def train_LR(input, output):
 
     X_train = np.loadtxt(input/"x_train.csv", delimiter=",")
     y_train = np.loadtxt(input/"y_train.csv", delimiter=",")
-    train_size = int(len(y_train)*0.8)
 
-    X_cv = X_train[train_size:,:]
-    X_train = X_train[:train_size,:]
-
-    y_cv = y_train[train_size:]
-    y_train = y_train[:train_size]
+    X_cv = np.loadtxt(input/"x_cv.csv", delimiter=",")
+    y_cv = np.loadtxt(input/"y_cv.csv", delimiter=",")
 
     model = LogisticRegression(random_state=42, C=0.1, max_iter=1000).fit(X_train, y_train)
 
@@ -121,13 +129,9 @@ def train_RF(input, output):
 
     X_train = np.loadtxt(input/"x_train.csv", delimiter=",")
     y_train = np.loadtxt(input/"y_train.csv", delimiter=",")
-    train_size = int(len(y_train)*0.8)
 
-    X_cv = X_train[train_size:,:]
-    X_train = X_train[:train_size,:]
-
-    y_cv = y_train[train_size:]
-    y_train = y_train[:train_size]
+    X_cv = np.loadtxt(input/"x_cv.csv", delimiter=",")
+    y_cv = np.loadtxt(input/"y_cv.csv", delimiter=",")
 
     model = RandomForestClassifier(random_state=42).fit(X_train, y_train)
 
@@ -149,31 +153,30 @@ def train_LSTM(input, output, look_back, verbose=0):
     output.mkdir(parents=True, exist_ok=True)
 
     X_train = np.loadtxt(input/"x_train.csv", delimiter=",")
-    y_train = np.loadtxt(input/"y_train.csv", delimiter=",")
-    train_size = int(len(y_train)*0.8)
 
-    X_cv = X_train[train_size:,:]
-    X_train = X_train[:train_size,:]
+    y_train = np.loadtxt(input/"y_train.csv", delimiter=",").reshape((-1,1))
 
-    y_cv = y_train[train_size:].reshape((-1,1))
-    y_train = y_train[:train_size].reshape((-1,1))
+    X_cv = np.loadtxt(input/"x_cv_under.csv", delimiter=",")
+    y_cv = np.loadtxt(input/"y_cv_under.csv", delimiter=",").reshape((-1,1))
 
     X_train = np.reshape(X_train, (X_train.shape[0], look_back, -1))
     X_cv = np.reshape(X_cv, (X_cv.shape[0], look_back, -1))
 
-    model = create_LSTM2(look_back, X_train.shape[-1])
+    model = create_LSTM(look_back, X_train.shape[-1])
 
-    custom_metrics = CustomCallback((X_cv, y_cv), start, verbose, output/"checkpoint_file.keras")
+    custom_metrics = CustomCallback((X_cv, y_cv), (X_train, y_train), start, verbose, output/"checkpoint_file.keras")
 
     history = model.fit(X_train, y_train,
-            epochs=100, verbose = verbose,
+            epochs=50, verbose = verbose, batch_size=1024,
             callbacks=[custom_metrics])
     
     metrics = custom_metrics.get_metrics()
 
-    history.history["f1"] = metrics[0]
-    history.history["mcc"] = metrics[1]
-    history.history["times"] = metrics[2]
+    history.history["f1_train"] = metrics[0]
+    history.history["mcc_train"] = metrics[1]
+    history.history["f1_val"] = metrics[2]
+    history.history["mcc_val"] = metrics[3]
+    history.history["times"] = metrics[4]
 
     history = json.dumps(history.history)
     
@@ -181,7 +184,7 @@ def train_LSTM(input, output, look_back, verbose=0):
     f.write(history)
     f.close()
 
-    model = tf.keras.models.load_weights(output/"checkpoint_file.keras")
+    model.load_weights(output/"checkpoint_file.keras")
 
     predictions = model.predict(X_cv, verbose=verbose)
 
@@ -201,12 +204,13 @@ if __name__ == '__main__':
     parser.add_argument('-l', type=int, help='Model look back', default=10)
 
     args = parser.parse_args()
-    if args.t == "a" or args.t == "m":
-        print("Training LSTM")
-        train_LSTM(args.f, args.o, args.l, 0)
     if args.t == "a" or args.t == "l":
         print("Training LR")
         train_LR(args.f, args.o)
     if args.t == "a" or args.t == "r":
         print("Training RF")
         train_RF(args.f, args.o)
+    if args.t == "a" or args.t == "m":
+        print("Training LSTM")
+        train_LSTM(args.f, args.o, args.l, 2)
+    
