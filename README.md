@@ -1,7 +1,5 @@
 # XAI-FL
 
-# OUTDATED
-
 ## Structure
 
 This repository has the following structure:
@@ -38,3 +36,67 @@ For the dataset structure:
 - xai/ contains the results for each XAI algorithm, including the .csv files with the explanations and the plots.
 - data_processing.py is used to create data for training, validation and testing from the raw data.
 - model.py has the implementation of the model to be used in the experiments.
+
+## Running the experiments
+
+
+
+## Results
+
+### Network Slicing
+
+#### SHAP
+
+##### PCC
+
+![shap correlation values using PCC](Slicing5G/xai/shap/correlation_Pearson.png)
+
+##### SRCC
+
+![shap correlation values using PCC](Slicing5G/xai/shap/correlation_Spearman.png)
+
+
+#### fANOVA 
+
+##### PCC
+
+![shap correlation values using PCC](Slicing5G/xai/fanova/correlation_Pearson.png)
+
+##### SRCC
+
+![shap correlation values using PCC](Slicing5G/xai/fanova/correlation_Spearman.png)
+
+
+### Intrusion Detection
+
+#### SHAP
+
+##### PCC
+
+![shap correlation values using PCC](IOT_DNL/xai/shap/correlation_Pearson.png)
+
+##### SRCC
+
+![shap correlation values using PCC](IOT_DNL/xai/shap/correlation_Spearman.png)
+
+
+#### fANOVA 
+
+##### PCC
+
+![shap correlation values using PCC](IOT_DNL/xai/fanova/correlation_Pearson.png)
+
+##### SRCC
+
+![shap correlation values using PCC](IOT_DNL/xai/fanova/correlation_Spearman.png)
+
+
+## Authors
+
+* **Rafael Teixeira** - [rgtzths](https://github.com/rgtzths)
+* **Leonardo Almeida** - [leoalmPT](https://github.com/leoalmPT/)
+* **Pedro Rodrigues** - [pedro535](https://github.com/pedro535/)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
