@@ -40,7 +40,6 @@ For the dataset structure:
 ## Running the experiments
 
 
-
 ## Results
 
 ### Network Slicing
@@ -53,18 +52,18 @@ For the dataset structure:
 
 ##### SRCC
 
-![shap correlation values using PCC](Slicing5G/xai/shap/correlation_Spearman.png)
+![shap correlation values using SRCC](Slicing5G/xai/shap/correlation_Spearman.png)
 
 
 #### fANOVA 
 
 ##### PCC
 
-![shap correlation values using PCC](Slicing5G/xai/fanova/correlation_Pearson.png)
+![fanova correlation values using PCC](Slicing5G/xai/fanova/correlation_Pearson.png)
 
 ##### SRCC
 
-![shap correlation values using PCC](Slicing5G/xai/fanova/correlation_Spearman.png)
+![fanova correlation values using SRCC](Slicing5G/xai/fanova/correlation_Spearman.png)
 
 
 ### Intrusion Detection
@@ -77,18 +76,18 @@ For the dataset structure:
 
 ##### SRCC
 
-![shap correlation values using PCC](IOT_DNL/xai/shap/correlation_Spearman.png)
+![shap correlation values using SRCC](IOT_DNL/xai/shap/correlation_Spearman.png)
 
 
 #### fANOVA 
 
 ##### PCC
 
-![shap correlation values using PCC](IOT_DNL/xai/fanova/correlation_Pearson.png)
+![fanova correlation values using PCC](IOT_DNL/xai/fanova/correlation_Pearson.png)
 
 ##### SRCC
 
-![shap correlation values using PCC](IOT_DNL/xai/fanova/correlation_Spearman.png)
+![fanova correlation values using SRCC](IOT_DNL/xai/fanova/correlation_Spearman.png)
 
 
 ## Authors
