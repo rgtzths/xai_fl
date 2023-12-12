@@ -1,65 +1,40 @@
-# dl_costs
+# XAI-FL
 
-## Installing
+# OUTDATED
 
-To run the scenarios locally please install the requirements
+## Structure
 
- `pip install -r requirements.txt`
+This repository has the following structure:
+```
+├── FL/
+├── XAI/
+├── correlation.py
+├── data_division.py
+├── feature_analysis.py
+├── federated_learning.py
+├── model_eval.py
+├── single_training.py
+└── xai.py
+```
 
-If you want to run the experiments in RPIs please follow the `rpi_setup_comands.md`
+Other folders contain data and results for specific datasets, which have the following structure:
+```
+├── data/
+├── fl/
+├── models/
+├── xai/
+└── [DATASET].py
+```
 
-If you want to run the experiments in docker please run `docker compose up`.
+For the main structure:
+- FL/ contains the implementation of the federated learning algorithms, which are used in federated_learning.py. 
+- XAI/ contains the implementation of the XAI algorithms, which are used in xai.py. 
+- The other files are used to run experiments, use --help to see the options.
 
-## Dataset
-
-
-
-## Running
-
-To run locally you only need the following commands
-
-`mpirun -np 4 python mpi_training.py -d dataset/one_hot_encoding/`
-
-or 
-
-`mpirun -np 4 python mpi_custom_training.py -d dataset/one_hot_encoding/`
-
-If you want to run the single_host setting you can run
-
-`python model.py`
-
-To run on docker you will need to connect to the master container
-
-`docker exec -it --user mpiuser dl_costs-master-1 bash`
-
-Connect one time to every worker to confirm the fingerprint of the server.
-
-`ssh worker1` and then `exit`
-
-After this you can run the command
-
-`mpirun -np 4 -hostfile hostfile python mpi_training.py -d dataset`
-
-or
-
-`mpirun -np 4 -hostfile hostfile python mpi_custom_training.py -d dataset`
-
-inside the `code` folder.
-
-To change the hyperparameters please confirm the available options in the mpi_training.py and mpi_custom_training.py files
-
-
-## Results
-
-The results obtained with the different hyperparameters are presented in the `paper_results` folder
-the translation for the folder names is 10_g_50_l -> (decentralized optimization with 10 global epochs and 50 local epochs) and fed_sgd_64 -> (centralized optimization with batch size 64)
-
-
-
-## Authors
-
-* **Rafael Teixeira** - [rgtzths](https://github.com/rgtzths)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+For the dataset structure:
+- data/ contains the data files, including the train, test, validation and specific workers' data.
+- fl/ contains the results of the federated learning algorithms, including the models and the training logs, for each experiment.
+- models/ contains the models to be used in XAI algorithms.
+- xai/ contains the results for each XAI algorithm, including the .csv files with the explanations and the plots.
+- data_processing.py is used to create data for training, validation and testing from the raw data.
+- model.py has the implementation of the model to be used in the experiments.

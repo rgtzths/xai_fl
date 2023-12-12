@@ -1,3 +1,9 @@
+# all csv files inside any "data" folder and any subfolder
+**/data/**/*.csv
+**/data/**/*.xlsx
+**/data/**/*.npz
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -159,6 +165,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-#Ours
-dataset/*
-results/*
+
+# Divided dataset folder
+divided_dataset/
