@@ -86,8 +86,13 @@ class MNIST(Util):
 
 
     def create_model(self):
+        # https://arxiv.org/pdf/1811.08278.pdf
         return tf.keras.models.Sequential([
-            # input layer
-            # hidden layers
-            # output layer
+            tf.keras.layers.Conv2D(256, (5, 5), strides=(1, 1), padding='same', activation='relu', input_shape=(28, 28,1)),
+            tf.keras.layers.Conv2D(256, (5, 5), strides=(1, 1), padding='same', activation='relu'),
+            tf.keras.layers.Conv2D(128, (5, 5), strides=(1, 1), padding='same', activation='relu'),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(328, activation='relu'),
+            tf.keras.layers.Dense(192, activation='relu'),
+            tf.keras.layers.Dense(10, activation='softmax')
         ])

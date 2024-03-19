@@ -86,8 +86,15 @@ class FASHION(Util):
 
 
     def create_model(self):
+        # https://www.bhu.ac.in/research_pub/jsr/Volumes/JSR_64_02_2020/51.pdf ------- architecture 2
         return tf.keras.models.Sequential([
-            # input layer
-            # hidden layers
-            # output layer
-        ])
+        tf.keras.layers.Conv2D(64, (2, 2), activation='relu', input_shape=(28, 28,1)),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.Conv2D(64, (2, 2), activation='relu'),
+        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(64, activation='relu'),
+        tf.keras.layers.Dropout(0.25),
+        tf.keras.layers.Dense(10, activation='softmax')
+    ])
