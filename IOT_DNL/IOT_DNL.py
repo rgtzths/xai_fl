@@ -73,7 +73,7 @@ class IOT_DNL(Util):
 
 
     def create_model(self):
-        # 4 hidden layers (they didnt specify the number of neurons in each layer)
+        # https://www.taylorfrancis.com/chapters/edit/10.1201/9781003032175-11/deep-neural-network%E2%80%93based-security-model-iot-device-network-dukka-karun-kumar-reddy-janmenjoy-nayak-bighnaraj-naik-sai-pratyusha
         return tf.keras.models.Sequential([
             # flatten layer
             tf.keras.layers.Flatten(input_shape=(11,)),
