@@ -14,7 +14,10 @@ def run(
     early_stop,
     learning_rate,
     batch_size,
-    epochs):
+    epochs,
+    patience,
+    min_delta
+    ):
     
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -24,6 +27,7 @@ def run(
     stop = False
     stop_buff = bytearray(pickle.dumps(stop))
     dataset = dataset_util.name
+    patience_buffer = [0]*patience
 
     if rank == 0:
         print("Running centralized async")
@@ -32,7 +36,7 @@ def run(
         print(f"Epochs: {epochs}")
         print(f"Batch size: {batch_size}")
 
-    output = f"{dataset}/fl/centralized_async/{n_workers}_{epochs}"
+    output = f"{dataset}/fl/centralized_async/{n_workers}_{epochs}_{batch_size}"
     output = pathlib.Path(output)
     output.mkdir(parents=True, exist_ok=True)
     dataset = pathlib.Path(dataset)
@@ -72,7 +76,6 @@ def run(
         results = {"times" : {"train" : [], "comm_send" : [], "comm_recv" : [], "conv_send" : [], "conv_recv" : [], "epochs" : []}}
 
         X_train, y_train = dataset_util.load_worker_data(n_workers, rank)
-        X_train, y_train = X_train.values, y_train.values
 
         train_dataset = list(tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(batch_size))
 
@@ -161,8 +164,15 @@ def run(
                 results["mcc"].append(val_mcc)
                 results["times"]["global_times"].append(time.time() - start)
                 print("- val_f1: %6.3f - val_mcc %6.3f - val_acc %6.3f" %(val_f1, val_mcc, val_acc))
+                patience_buffer = patience_buffer[1:]
+                patience_buffer.append(val_mcc)
 
-                if val_mcc > early_stop:
+                p_stop = True
+                for value in patience_buffer[1:]:
+                    if abs(patience_buffer[0] - value) > min_delta:
+                        p_stop = False 
+
+                if (val_mcc > early_stop or p_stop) and (batch+1)//total_n_batches > 10:
                     stop = True
 
                 epoch_start = time.time()

@@ -16,7 +16,9 @@ def run(
     batch_size, 
     global_epochs, 
     local_epochs, 
-    alpha
+    alpha,
+    patience,
+    min_delta
 ):
 
     comm = MPI.COMM_WORLD
@@ -27,6 +29,8 @@ def run(
     stop = False
     stop_buff = bytearray(pickle.dumps(stop))
     dataset = dataset_util.name
+    patience_buffer = [0]*patience
+    best_weights = None
 
 
     if rank == 0:
@@ -38,7 +42,7 @@ def run(
         print(f"Batch size: {batch_size}")
         print(f"Alpha: {alpha}")
 
-    output = f"{dataset}/fl/decentralized_async/{n_workers}_{global_epochs}_{local_epochs}_{alpha}"
+    output = f"{dataset}/fl/decentralized_async/{n_workers}_{global_epochs}_{local_epochs}_{alpha}_{batch_size}"
     output = pathlib.Path(output)
     output.mkdir(parents=True, exist_ok=True)
     dataset = pathlib.Path(dataset)
@@ -89,7 +93,6 @@ def run(
         results = {"times" : {"train" : [], "comm_send" : [], "comm_recv" : [], "conv_send" : [], "conv_recv" : [], "epochs" : []}}
 
         X_train, y_train = dataset_util.load_worker_data(n_workers, rank)
-        X_train, y_train = X_train.values, y_train.values
 
         train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(batch_size)
 
@@ -168,19 +171,29 @@ def run(
                 val_mcc = matthews_corrcoef(y_cv, predictions)
                 val_acc = accuracy_score(y_cv, predictions)
 
+                if best_weights is None or val_mcc > max(results["mcc"]):
+                    best_weights = model.get_weights()
+
                 results["acc"].append(val_acc)
                 results["f1"].append(val_f1)
                 results["mcc"].append(val_mcc)
                 results["times"]["global_times"].append(time.time() - start)
+                patience_buffer = patience_buffer[1:]
+                patience_buffer.append(val_mcc)
+
                 print("- val_f1: %6.3f - val_mcc %6.3f - val_acc %6.3f" %(val_f1, val_mcc, val_acc))
 
-                if val_mcc > early_stop:
+                p_stop = True
+                max_mcc = max(results["mcc"][:-len(patience_buffer)], default=0)
+                max_buffer = max(patience_buffer, default=0)
+                if max_mcc + min_delta <= max_buffer:
+                    p_stop = False
+
+
+                if (val_mcc > early_stop or p_stop) and epoch//n_workers+1 > 10:
                     stop = True
 
                 epoch_start = time.time()
-
-            
-
     else:
         for global_epoch in range(global_epochs):
             epoch_start = time.time()
@@ -219,6 +232,7 @@ def run(
                 break
     history = json.dumps(results)
     if rank==0:
+        model.set_weights(best_weights)
         model.save(output/'trained_model.keras')
         with open(output/"server.json", "w") as f:
             f.write(history)
