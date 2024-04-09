@@ -73,8 +73,7 @@ class IOT_DNL(Util):
 
 
     def create_model(self):
-        # Optimizer: Adam
-        # Learning rate: 0.000005
+        # 4 hidden layers (they didnt specify the number of neurons in each layer)
         return tf.keras.models.Sequential([
             # flatten layer
             tf.keras.layers.Flatten(input_shape=(11,)),

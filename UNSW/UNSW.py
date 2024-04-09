@@ -47,6 +47,7 @@ class UNSW(Util):
 
 
     def create_model(self):
+        # https://www.semanticscholar.org/reader/00f44fb92b02552208729e228f0f3a6e06cbdadd table II
         return tf.keras.models.Sequential([
             # input layer
             tf.keras.layers.InputLayer(input_shape=(39,)),
