@@ -6,6 +6,7 @@ tensorflow
 fanova
 mpi4py
 shap
+alibi
 
 plotly
 nbformat
