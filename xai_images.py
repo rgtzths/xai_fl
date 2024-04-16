@@ -45,9 +45,6 @@ for model_path in models:
     model = tf.keras.models.load_model(model_path)
     model_name = model_path.split("/")[-1].split(".")[0]
 
-    # TO REMOVE!
-    x_test = x_test[:10]
-
     sample = x_test[0]
     explainer = XAI_IMAGES[args.x](model, sample.shape)
 

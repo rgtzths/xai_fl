@@ -46,10 +46,6 @@ for model_path in models:
     model = tf.keras.models.load_model(model_path)
     model_name = model_path.split("/")[-1].split(".")[0]
 
-    # TO REMOVE!
-    x_test = x_test[:10]
-    y_test = y_test[:10]
-
     feature_importance = XAI[args.x](x_train, y_train, x_test, y_test, model)
 
     with open(folder / f"{model_name}.json", "w") as f: 
