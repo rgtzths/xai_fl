@@ -10,8 +10,9 @@ import cv2
 
 class GradCAM:
     
-    def __init__(self, model):
+    def __init__(self, model, img_size):
         self.model = model
+        self.img_size = img_size
         self.last_conv_layer = self.get_last_conv_layer()
         self.grad_model = self.get_grad_model()
 

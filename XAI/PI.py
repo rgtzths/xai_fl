@@ -4,7 +4,7 @@ from alibi.explainers import PermutationImportance, plot_permutation_importance
 
 def results(X_train, y_train, X_test, y_test, model):
     features = X_train.columns.tolist()
-    target = y_train.name
+    target = y_train.columns.tolist()[0]
 
     # To numpy
     X_train = X_train.values
