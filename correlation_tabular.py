@@ -11,8 +11,8 @@ CORR = {
 }
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-d", help="Dataset to use", default="MNIST")
-parser.add_argument("-x", help="XAI method to use", default="gradCAM")
+parser.add_argument("-d", help="Dataset to use", default="IOT_DNL")
+parser.add_argument("-x", help="XAI method to use", default="PI")
 args = parser.parse_args()
 
 # check if folder exists
