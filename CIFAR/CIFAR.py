@@ -101,7 +101,7 @@ class CIFAR(Util):
             tf.keras.layers.MaxPooling2D((2, 2)),
             tf.keras.layers.Dropout(0.25),
             tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(1024, activation='relu'),
-            tf.keras.layers.Dense(512, activation='relu'),
+            tf.keras.layers.Dense(1024, activation=tf.keras.layers.LeakyReLU()),
+            tf.keras.layers.Dense(512, activation=tf.keras.layers.LeakyReLU()),
             tf.keras.layers.Dense(10, activation='softmax')
         ])

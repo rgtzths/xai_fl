@@ -13,7 +13,7 @@ def results(X_train, y_train, X_test, y_test, model):
     y_test = y_test.values
 
     def predict_fn(X):
-        return np.argmax(model.predict(X), axis=1)
+        return np.argmax(model.predict(X, verbose=0), axis=1)
     
     explainer = PermutationImportance(predictor=predict_fn, score_fns='accuracy', feature_names=features)
     explanations = explainer.explain(X=X_test, y=y_test, kind='difference')

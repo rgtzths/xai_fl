@@ -27,7 +27,7 @@ class IntegratedGrads:
 
     def gradients(self, img_input, baseline=None, num_steps=50):
         img_input = np.expand_dims(img_input, axis=0)
-        top_pred_idx = np.argmax(self.model.predict(img_input))
+        top_pred_idx = np.argmax(self.model.predict(img_input, verbose=0))
 
         # Generate baseline image (all back)
         baseline = np.zeros(self.img_size).astype(np.float32)

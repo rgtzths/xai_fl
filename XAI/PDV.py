@@ -13,7 +13,7 @@ def results(X_train, y_train, X_test, y_test, model):
     y_test = y_test.values
 
     def predict_fn(X):
-        return np.argmax(model.predict(X), axis=1)
+        return np.argmax(model.predict(X, verbose=0), axis=1)
     
     explainer = PartialDependenceVariance(predictor=predict_fn, feature_names=features, target_names=[target])
     explanations = explainer.explain(X=X_test, method='importance')

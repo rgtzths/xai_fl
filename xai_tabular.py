@@ -19,6 +19,7 @@ if args.x not in XAI:
 models = Path(f"{args.d}/models").glob("*.keras")
 models = list(models) + list(Path(f"{args.d}/models").glob("*.h5"))
 models = [str(model) for model in models]
+print("\n\n\n")
 print(f"Found {len(models)} models")
 print(f"Models: {models}")
 
@@ -29,9 +30,9 @@ files = Path(folder).glob("*")
 # remove the extension and get only the name
 files = [str(file).split("/")[-1].split(".")[0] for file in files]
 # remove from models the ones that already have results
-models = [model for model in models if model.split("/")[-1].split(".")[0] not in files]
+models = [model for model in models if model.split("/")[-1].split(".")[0]]
 print(f"Models to process: {len(models)}")
-print(f"Models: {models}")
+print(f"Models: {files}")
 
 dataset_util = DATASETS[args.d]
 x_train, y_train = dataset_util.load_training_data()
@@ -50,3 +51,4 @@ for model_path in models:
 
     with open(folder / f"{model_name}.json", "w") as f: 
         json.dump(feature_importance, f, indent=4)
+print("\n\n\n")

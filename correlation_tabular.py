@@ -49,6 +49,10 @@ for filename in all_files:
 for corr_type, corr_fn in CORR.items():
     correlations = [corr_fn(xai_nn, exp)[0] for exp in explanations]
 
+    with open(f"{args.d}/xai/{args.x}/correlation_{corr_type}.txt", "w") as f:
+        for i, filename in enumerate(all_files):
+            f.write(f"{filename.split('/')[-1].split('.')[0]}: {correlations[i]:.4f}\n")
+
     plt.figure(figsize=(10, 6))
     plt.title(f"{corr_type} Correlation to single training")
     plt.xlabel("FL type")

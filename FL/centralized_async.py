@@ -27,7 +27,7 @@ def run(
     stop = False
     stop_buff = bytearray(pickle.dumps(stop))
     dataset = dataset_util.name
-    patience_buffer = [0]*patience
+    patience_buffer = [-1]*patience
 
     if rank == 0:
         print("Running centralized async")
@@ -172,7 +172,7 @@ def run(
                     if abs(patience_buffer[0] - value) > min_delta:
                         p_stop = False 
 
-                if (val_mcc > early_stop or p_stop) and (batch+1)//total_n_batches > 10:
+                if val_mcc >= early_stop or p_stop:
                     stop = True
 
                 epoch_start = time.time()
@@ -182,23 +182,21 @@ def run(
 
             train_time = time.time()
 
-            x_batch_train, y_batch_train = train_dataset[batch % len(train_dataset)]
-
             with tf.GradientTape() as tape:
-
+                x_batch_train, y_batch_train = train_dataset[batch % len(train_dataset)]
                 logits = model(x_batch_train, training=True) 
                 loss_value = loss_fn(y_batch_train, logits)
 
-            grads = tape.gradient(loss_value, model.trainable_weights)
-            results["times"]["train"].append(time.time() - train_time)
+                grads = tape.gradient(loss_value, model.trainable_weights)
+                results["times"]["train"].append(time.time() - train_time)
 
-            load_time = time.time()
-            grads = pickle.dumps(grads)
-            results["times"]["conv_send"].append(time.time() - load_time)
-            
-            comm_time = time.time()
-            comm.Send(grads, dest=0, tag=batch)
-            results["times"]["comm_send"].append(time.time() - comm_time)
+                load_time = time.time()
+                grads = pickle.dumps(grads)
+                results["times"]["conv_send"].append(time.time() - load_time)
+                
+                comm_time = time.time()
+                comm.Send(grads, dest=0, tag=batch)
+                results["times"]["comm_send"].append(time.time() - comm_time)
 
             com_time = time.time()
             comm.Recv(model_buff, source=0, tag=batch)

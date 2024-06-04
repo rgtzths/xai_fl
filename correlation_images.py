@@ -52,8 +52,13 @@ for corr_type, corr_fn in CORR.items():
     correlations = []
 
     for i, exp in enumerate(explanations):
-        coefs = [corr_fn(xai_nn[i], exp[i])[0] for i in range(len(exp))]
+        coefs = (corr_fn(xai_nn[i], exp[i])[0] for i in range(len(exp)))
+        coefs = [x for x in coefs if str(x) != "nan"]
         correlations.append(np.mean(coefs))
+
+    with open(f"{args.d}/xai/{args.x}/correlation_{corr_type}.txt", "w") as f:
+        for i, filename in enumerate(all_files):
+            f.write(f"{filename.split('/')[-1].split('.')[0]}: {correlations[i]:.4f}\n")
 
     plt.figure(figsize=(10, 6))
     plt.title(f"{corr_type} Correlation to single training")

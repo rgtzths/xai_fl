@@ -79,15 +79,14 @@ class Slicing5G(Util):
 
 
     def create_model(self):
-        # Optimizer: Adam
-        # Learning rate: 0.00001
+        # https://ieeexplore.ieee.org/document/8993066
         return tf.keras.models.Sequential([
             # flatten layer
             tf.keras.layers.Flatten(input_shape=(8,)),
             # hidden layers
-            tf.keras.layers.Dense(32, activation='relu'),
-            tf.keras.layers.Dense(32, activation='relu'),
-            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(8, activation='relu'),
+            tf.keras.layers.Dense(8, activation='relu'),
+            tf.keras.layers.Dense(4, activation='tanh'),
             # output layer
             tf.keras.layers.Dense(3, activation="softmax")
         ])

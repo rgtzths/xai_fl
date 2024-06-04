@@ -29,7 +29,7 @@ files = Path(folder).glob("*")
 # remove the extension and get only the name
 files = [str(file).split("/")[-1].split(".")[0] for file in files]
 # remove from models the ones that already have results
-models = [model for model in models if model.split("/")[-1].split(".")[0] not in files]
+models = [model for model in models if model.split("/")[-1].split(".")[0]]
 print(f"Models to process: {len(models)}")
 print(f"Models: {models}")
 

@@ -28,7 +28,7 @@ def run(
     stop_buff = bytearray(pickle.dumps(stop))
 
     dataset = dataset_util.name
-    patience_buffer = [0]*patience
+    patience_buffer = [-1]*patience
 
 
     if rank == 0:
@@ -208,7 +208,7 @@ def run(
                     if abs(patience_buffer[0] - value) > min_delta:
                         p_stop = False 
     
-                if (val_mcc > early_stop or p_stop) and (batch+1) // n_batches > 10:
+                if val_mcc >= early_stop or p_stop:
                     stop = True
 
             else:

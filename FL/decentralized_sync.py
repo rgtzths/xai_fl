@@ -29,7 +29,7 @@ def run(
     stop_buff = bytearray(pickle.dumps(stop))
 
     dataset = dataset_util.name
-    patience_buffer = [0]*patience
+    patience_buffer = [-1]*patience
 
     if rank == 0:
         print("Running decentralized sync")
@@ -87,7 +87,7 @@ def run(
         compr_data = pickle.dumps(len(X_train))
 
         comm.Send(compr_data, dest=0, tag=1000)
-        model_buff = bytearray(len(model_buff) + 10000)
+        model_buff = bytearray(len(model_buff) + 1000)
 
 
     comm.Bcast(model_buff, root=0)
@@ -136,7 +136,6 @@ def run(
 
         com_time = time.time()
         comm.Bcast(model_buff, root=0)
-
         if rank == 0:
             results["times"]["comm_send"].append(time.time() - com_time)
 
@@ -154,7 +153,6 @@ def run(
             stop_buff = bytearray(pickle.dumps(stop))
 
         comm.Bcast(stop_buff, root=0)
-
         if rank != 0:
             stop = pickle.loads(stop_buff)
             if stop:
@@ -186,7 +184,7 @@ def run(
                 if abs(patience_buffer[0] - value) > min_delta:
                     p_stop = False 
 
-            if (val_mcc > early_stop or p_stop) and global_epoch > 10:
+            if val_mcc >= early_stop or p_stop:
                 stop = True
             
 
